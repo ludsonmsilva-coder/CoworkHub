@@ -1,0 +1,9 @@
+campo,valor_valido,descricao
+status_item,PASSOU,Item validado com sucesso
+status_item,FALHOU,Item executado com falha
+status_item,NAO TESTADO,Item nao executado no ciclo
+decisao,GO,Liberado para uso/demo
+decisao,GO COM RESSALVAS,Liberado com pendencias conhecidas
+decisao,NO GO,Nao liberar
+crash_critico,sim,Houve crash em fluxo critico
+crash_critico,nao,Nao houve crash critico

@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Remove o contorno de foco do navegador em elementos tocáveis (Pressable),
+   mantendo o foco visível nos campos de texto para acessibilidade */
+div[role="button"]:focus,
+div[role="button"]:focus-visible {
+  outline: none !important;
+}
