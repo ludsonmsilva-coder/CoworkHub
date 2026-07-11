@@ -34,6 +34,13 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B1220"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "61134439-1a28-4393-8141-05a621341a77"
+      }
+    },
+    "owner": "lokaro"
   }
 }
