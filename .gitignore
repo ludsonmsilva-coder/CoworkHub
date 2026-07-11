@@ -2,6 +2,7 @@ node_modules/
 .expo/
 dist/
 web-build/
+.vercel/
 *.log
 .env
 .env.local
@@ -14,3 +15,4 @@ supabase/.temp/
 
 expo-env.d.ts
 # @end expo-cli
+.vercel
