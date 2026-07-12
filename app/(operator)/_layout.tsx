@@ -72,6 +72,8 @@ export default function OperatorLayout() {
           ),
         }}
       />
+      {/* Tela de "Reservas de hoje" — acessível pelo painel, oculta na barra de abas */}
+      <Tabs.Screen name="today-bookings" options={{ href: null }} />
     </Tabs>
   );
 }

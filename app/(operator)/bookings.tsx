@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams } from "expo-router";
 import { CalendarDays, DoorOpen, Plus, Users } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -35,7 +36,10 @@ function toISODate(d: Date) {
 
 export default function Bookings() {
   const { t, isDark, language } = useAppPreferences();
-  const [tab, setTab] = useState<"agenda" | "rooms" | "leases">("agenda");
+  const params = useLocalSearchParams<{ tab?: string }>();
+  const initialTab: "agenda" | "rooms" | "leases" =
+    params.tab === "rooms" ? "rooms" : params.tab === "leases" ? "leases" : "agenda";
+  const [tab, setTab] = useState<"agenda" | "rooms" | "leases">(initialTab);
   const [leaseModal, setLeaseModal] = useState(false);
   const [selectedDay, setSelectedDay] = useState(toISODate(new Date()));
   const [bookingModal, setBookingModal] = useState(false);
@@ -181,6 +185,16 @@ export default function Bookings() {
 
       {tab === "agenda" ? (
         <>
+          {/* Lista de reservas do dia (calendário + filtros rolam junto no cabeçalho) */}
+          <FlatList
+            data={filteredBookings}
+            keyExtractor={(item) => item.id}
+            contentContainerClassName="pb-32 flex-grow"
+            refreshControl={
+              <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+            }
+            ListHeaderComponent={
+              <View className="pt-1">
           {/* Calendário com mês e ano */}
           <View className="px-5 mb-3">
             <MonthCalendar
@@ -200,96 +214,84 @@ export default function Bookings() {
               {t("bookings.filters")}
             </Text>
           </View>
-          <View className="mb-3">
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="px-5 gap-2"
+          <View className="mb-3 px-5 flex-row flex-wrap gap-2">
+            <Pressable
+              onPress={() => setRoomFilter("all")}
+              className={`px-3 py-2 rounded-full border ${
+                roomFilter === "all"
+                  ? "bg-primary border-primary"
+                  : isDark
+                    ? "bg-card-dark border-border-dark"
+                    : "bg-white border-gray-200"
+              }`}
             >
-              <Pressable
-                onPress={() => setRoomFilter("all")}
-                className={`px-3 py-2 rounded-full border ${
-                  roomFilter === "all"
-                    ? "bg-primary border-primary"
-                    : isDark
-                      ? "bg-card-dark border-border-dark"
-                      : "bg-white border-gray-200"
-                }`}
-              >
-                <Text className={`text-xs font-semibold ${roomFilter === "all" ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
-                  {t("bookings.allRooms")}
-                </Text>
-              </Pressable>
+              <Text className={`text-xs font-semibold ${roomFilter === "all" ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`} numberOfLines={1}>
+                {t("bookings.allRooms")}
+              </Text>
+            </Pressable>
 
-              {(rooms ?? []).map((room) => {
-                const selected = roomFilter === room.id;
-                return (
-                  <Pressable
-                    key={room.id}
-                    onPress={() => setRoomFilter(room.id)}
-                    className={`px-3 py-2 rounded-full border flex-row items-center ${
-                      selected
-                        ? "bg-primary border-primary"
-                        : isDark
-                          ? "bg-card-dark border-border-dark"
-                          : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <View
-                      className="h-2 w-2 rounded-full mr-1.5"
-                      style={{ backgroundColor: selected ? "#fff" : room.color }}
-                    />
-                    <Text className={`text-xs font-semibold ${selected ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
-                      {room.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
+            {(rooms ?? []).map((room) => {
+              const selected = roomFilter === room.id;
+              return (
+                <Pressable
+                  key={room.id}
+                  onPress={() => setRoomFilter(room.id)}
+                  className={`px-3 py-2 rounded-full border flex-row items-center ${
+                    selected
+                      ? "bg-primary border-primary"
+                      : isDark
+                        ? "bg-card-dark border-border-dark"
+                        : "bg-white border-gray-200"
+                  }`}
+                >
+                  <View
+                    className="h-2 w-2 rounded-full mr-1.5"
+                    style={{ backgroundColor: selected ? "#fff" : room.color }}
+                  />
+                  <Text className={`text-xs font-semibold ${selected ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`} numberOfLines={1}>
+                    {room.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
 
-          <View className="mb-3">
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="px-5 gap-2"
+          <View className="mb-3 px-5 flex-row flex-wrap gap-2">
+            <Pressable
+              onPress={() => setMemberFilter("all")}
+              className={`px-3 py-2 rounded-full border ${
+                memberFilter === "all"
+                  ? "bg-primary border-primary"
+                  : isDark
+                    ? "bg-card-dark border-border-dark"
+                    : "bg-white border-gray-200"
+              }`}
             >
-              <Pressable
-                onPress={() => setMemberFilter("all")}
-                className={`px-3 py-2 rounded-full border ${
-                  memberFilter === "all"
-                    ? "bg-primary border-primary"
-                    : isDark
-                      ? "bg-card-dark border-border-dark"
-                      : "bg-white border-gray-200"
-                }`}
-              >
-                <Text className={`text-xs font-semibold ${memberFilter === "all" ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
-                  {t("bookings.allMembers")}
-                </Text>
-              </Pressable>
+              <Text className={`text-xs font-semibold ${memberFilter === "all" ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
+                {t("bookings.allMembers")}
+              </Text>
+            </Pressable>
 
-              {(members ?? []).map((member) => {
-                const selected = memberFilter === member.id;
-                return (
-                  <Pressable
-                    key={member.id}
-                    onPress={() => setMemberFilter(member.id)}
-                    className={`px-3 py-2 rounded-full border ${
-                      selected
-                        ? "bg-primary border-primary"
-                        : isDark
-                          ? "bg-card-dark border-border-dark"
-                          : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <Text className={`text-xs font-semibold ${selected ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
-                      {member.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
+            {(members ?? []).map((member) => {
+              const selected = memberFilter === member.id;
+              return (
+                <Pressable
+                  key={member.id}
+                  onPress={() => setMemberFilter(member.id)}
+                  className={`px-3 py-2 rounded-full border ${
+                    selected
+                      ? "bg-primary border-primary"
+                      : isDark
+                        ? "bg-card-dark border-border-dark"
+                        : "bg-white border-gray-200"
+                  }`}
+                >
+                  <Text className={`text-xs font-semibold ${selected ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`} numberOfLines={1}>
+                    {member.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
 
           {/* Ocupação das salas no dia */}
@@ -331,13 +333,7 @@ export default function Bookings() {
             </ScrollView>
           </View>
 
-          {/* Lista de reservas do dia */}
-          <FlatList
-            data={filteredBookings}
-            keyExtractor={(item) => item.id}
-            contentContainerClassName="px-5 pb-32 flex-grow"
-            refreshControl={
-              <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+              </View>
             }
             renderItem={({ item }) => {
               const start = new Date(item.starts_at);
@@ -347,7 +343,7 @@ export default function Bookings() {
               return (
                 <Pressable
                   onLongPress={() => confirmCancel(item.id)}
-                  className={`rounded-2xl p-4 mb-3 border flex-row items-center ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
+                  className={`mx-5 rounded-2xl p-4 mb-3 border flex-row items-center ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
                   style={({ pressed }) =>
                     pressed
                       ? {
@@ -588,18 +584,18 @@ function LeasesSection({
               >
                 <FileText size={20} color={item.rooms?.color ?? "#2563EB"} />
               </View>
-              <View className="flex-1">
-                <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`}>
+              <View className="flex-1 min-w-0 mr-3">
+                <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
                   {item.rooms?.name ?? "—"}
                 </Text>
-                <Text className={`text-xs mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
+                <Text className={`text-xs mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`} numberOfLines={2}>
                   {item.members?.name ?? "—"}
                 </Text>
                 <Text className={`text-xs mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
                   {money(Number(item.monthly_rent))} · {t("lease.dueEvery", { d: item.due_day })}
                 </Text>
               </View>
-              <View className="items-end">
+              <View className="items-end shrink-0">
                 <View
                   className={`px-2.5 py-1 rounded-full mb-2 ${
                     ended

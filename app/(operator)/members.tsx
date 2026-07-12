@@ -57,18 +57,20 @@ function MemberCard({
       <View className="h-11 w-11 rounded-full bg-primary-light items-center justify-center mr-3">
         <Text className="text-primary font-bold">{initials(member.name)}</Text>
       </View>
-      <View className="flex-1 mr-2">
-        <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
+      <View className="flex-1 min-w-0 mr-2">
+        <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={2}>
           {member.name}
         </Text>
         <Text className={`text-xs mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`} numberOfLines={1}>
           {member.email}
         </Text>
       </View>
-      <StatusBadge status={member.status} />
+      <View className="shrink-0">
+        <StatusBadge status={member.status} />
+      </View>
       <Pressable
         onPress={onDelete}
-        className={`h-9 w-9 rounded-full items-center justify-center ml-2 ${
+        className={`h-9 w-9 rounded-full items-center justify-center ml-2 shrink-0 ${
           isDark ? "bg-red-950" : "bg-red-50"
         }`}
       >

@@ -10,6 +10,8 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { Member, Space, UserRole } from "@/types";
 
+const PAID_EMAIL_OVERRIDES = new Set(["ludson.m.silva@gmail.com"]);
+
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
@@ -46,7 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (ownedSpace) {
-      setSpace(ownedSpace as Space);
+      const nextSpace = ownedSpace as Space;
+      if (PAID_EMAIL_OVERRIDES.has(session?.user?.email?.toLowerCase() ?? "")) {
+        nextSpace.plan = "pro";
+      }
+      setSpace(nextSpace);
       setMember(null);
       setRole("operator");
       return;
@@ -67,7 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select("*")
         .eq("id", (memberRow as Member).space_id)
         .maybeSingle();
-      setSpace((memberSpace as Space) ?? null);
+      const nextSpace = (memberSpace as Space) ?? null;
+      if (nextSpace && PAID_EMAIL_OVERRIDES.has(session?.user?.email?.toLowerCase() ?? "")) {
+        nextSpace.plan = "pro";
+      }
+      setSpace(nextSpace);
       return;
     }
 

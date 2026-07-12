@@ -175,7 +175,7 @@ function InvoiceRow({
         : "Sem membro";
 
   return (
-    <View className={`rounded-2xl p-4 mb-3 border ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}>
+    <View className={`mx-5 rounded-2xl p-4 mb-3 border ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}>
       <View className="flex-row items-start justify-between">
         <View className="flex-1 mr-3">
           <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
@@ -408,6 +408,15 @@ export default function Finance() {
     <SafeAreaView className={`flex-1 ${isDark ? "bg-paper-dark" : "bg-paper"}`} edges={["top"]}>
       <ScreenHeader title={t("finance.title")} subtitle={t("finance.subtitle")} />
 
+      <FlatList
+        data={invoices ?? []}
+        keyExtractor={(item) => item.id}
+        contentContainerClassName="pb-8 flex-grow"
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+        }
+        ListHeaderComponent={
+          <View>
       <View className="px-5 mb-3 flex-row justify-between">
         <KpiCard
           icon={Clock3}
@@ -437,10 +446,10 @@ export default function Finance() {
 
       <RevenueSummary currency={space?.currency ?? "USD"} />
 
-      <View className="px-5 mb-3 flex-row">
+      <View className="px-5 mb-3 flex-row flex-wrap gap-2">
         <Pressable
           onPress={() => setManualOpen(true)}
-          className="h-11 px-4 rounded-xl bg-primary items-center justify-center flex-row mr-2 active:bg-primary-dark"
+          className="h-11 px-4 rounded-xl bg-primary items-center justify-center flex-row active:bg-primary-dark"
           style={({ pressed }) =>
             pressed
               ? {
@@ -485,7 +494,7 @@ export default function Finance() {
         <Pressable
           onPress={confirmCleanupDuplicates}
           disabled={cleanupDuplicates.isPending}
-          className={`h-11 px-4 rounded-xl border items-center justify-center flex-row ml-2 ${
+          className={`h-11 px-4 rounded-xl border items-center justify-center flex-row ${
             cleanupDuplicates.isPending
               ? isDark
                 ? "bg-slate-800 border-border-dark"
@@ -610,13 +619,7 @@ export default function Finance() {
           }}
         />
       </View>
-
-      <FlatList
-        data={invoices ?? []}
-        keyExtractor={(item) => item.id}
-        contentContainerClassName="px-5 pb-8 flex-grow"
-        refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          </View>
         }
         renderItem={({ item }) => (
           <InvoiceRow

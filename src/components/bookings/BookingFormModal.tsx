@@ -311,7 +311,7 @@ export function BookingFormModal({ visible, onClose, dayISO }: Props) {
                               : "border-gray-200 bg-white"
                         }`}
                       >
-                        <Text className={sel ? "text-primary font-semibold" : isDark ? "text-slate-100" : "text-ink"}>
+                          <Text className={`flex-1 mr-3 ${sel ? "text-primary font-semibold" : isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
                           {m.name}
                         </Text>
                         {sel ? <Text className="text-primary font-bold">✓</Text> : null}

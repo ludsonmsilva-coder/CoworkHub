@@ -24,6 +24,7 @@ function KpiCard({
   bg,
   isDark,
   featured,
+  onPress,
 }: {
   icon: any;
   label: string;
@@ -33,20 +34,21 @@ function KpiCard({
   bg: string;
   isDark: boolean;
   featured?: boolean;
+  onPress?: () => void;
 }) {
-  return (
-    <View
-      className={`rounded-3xl p-4 border mb-3 ${
-        featured
-          ? isDark
-            ? "bg-slate-900 border-cyan-400/30"
-            : "bg-[#EAF6FF] border-[#BFE2F8]"
-          : isDark
-            ? "bg-card-dark border-border-dark"
-            : "bg-white border-gray-100"
-      }`}
-      style={featured ? { width: "100%" } : { width: "48%" }}
-    >
+  const cardClass = `rounded-3xl p-4 border mb-3 ${
+    featured
+      ? isDark
+        ? "bg-slate-900 border-cyan-400/30"
+        : "bg-[#EAF6FF] border-[#BFE2F8]"
+      : isDark
+        ? "bg-card-dark border-border-dark"
+        : "bg-white border-gray-100"
+  }`;
+  const width = featured ? "100%" : "48%";
+
+  const inner = (
+    <>
       <View className="flex-row items-start justify-between">
         <View
           className="h-10 w-10 rounded-2xl items-center justify-center mb-3"
@@ -54,13 +56,37 @@ function KpiCard({
         >
           <Icon size={18} color={tint} />
         </View>
-        {featured ? <ChevronRight size={18} color={isDark ? "#67E8F9" : "#0E7490"} /> : null}
+        {onPress ? (
+          <ChevronRight size={18} color={isDark ? "#67E8F9" : "#0E7490"} />
+        ) : null}
       </View>
       <Text className={`text-xs font-semibold uppercase tracking-wide ${isDark ? "text-slate-400" : "text-ink-low"}`}>
         {label}
       </Text>
       <Text className={`text-3xl font-bold mt-1 ${isDark ? "text-slate-100" : "text-ink"}`}>{value}</Text>
       <Text className={`text-sm mt-2 leading-5 ${isDark ? "text-slate-300" : "text-ink-mid"}`}>{hint}</Text>
+    </>
+  );
+
+  if (onPress) {
+    return (
+      <Pressable
+        onPress={onPress}
+        className={cardClass}
+        style={({ pressed }) => ({
+          width,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+          opacity: pressed ? 0.95 : 1,
+        })}
+      >
+        {inner}
+      </Pressable>
+    );
+  }
+
+  return (
+    <View className={cardClass} style={{ width }}>
+      {inner}
     </View>
   );
 }
@@ -253,6 +279,7 @@ export default function Dashboard() {
             tint="#0E4A7A"
             bg="#E8F0F7"
             isDark={isDark}
+            onPress={() => router.push("/(operator)/members")}
           />
           <KpiCard
             icon={CalendarCheck}
@@ -263,6 +290,7 @@ export default function Dashboard() {
             bg="#ECFDF5"
             isDark={isDark}
             featured
+            onPress={() => router.push("/(operator)/today-bookings")}
           />
           <KpiCard
             icon={DoorOpen}
@@ -272,6 +300,12 @@ export default function Dashboard() {
             tint="#155E75"
             bg="#ECFEFF"
             isDark={isDark}
+            onPress={() =>
+              router.push({
+                pathname: "/(operator)/bookings",
+                params: { tab: "rooms" },
+              })
+            }
           />
           <KpiCard
             icon={AlertCircle}
@@ -281,6 +315,7 @@ export default function Dashboard() {
             tint="#DC2626"
             bg="#FEF2F2"
             isDark={isDark}
+            onPress={() => router.push("/(operator)/finance")}
           />
         </View>
 
