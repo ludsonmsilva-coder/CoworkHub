@@ -80,3 +80,14 @@ The included `vercel.json` already configures the build output and rewrites all 
 npm run typecheck
 npm run build:web
 ```
+
+## Supabase DB hardening (phase 2)
+
+This repository includes:
+
+1. RLS/policy/index migration baseline:
+   - `supabase/migrations/20260713_security_rls_hardening.sql`
+2. Audit SQL checklist for production verification:
+   - `supabase/DB_AUDIT_CHECKLIST.sql`
+
+Run them in Supabase SQL Editor (or via migrations pipeline) and confirm all checklist queries return expected results.
