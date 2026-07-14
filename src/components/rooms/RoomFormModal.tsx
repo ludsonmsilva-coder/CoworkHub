@@ -139,7 +139,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
         >
           <View
             className={`${Platform.OS === "web" ? "w-[95%] max-w-3xl self-center rounded-3xl" : "max-h-[90%] rounded-t-3xl"} overflow-hidden ${isDark ? "bg-paper-dark" : "bg-white"}`}
-            style={Platform.OS === "web" ? { maxHeight: "92vh" } : undefined}
+            style={Platform.OS === "web" ? { maxHeight: 760 } : undefined}
           >
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-ink"}`}>

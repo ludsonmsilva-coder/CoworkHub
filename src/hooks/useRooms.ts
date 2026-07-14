@@ -42,13 +42,40 @@ export function useSaveRoom() {
 
   return useMutation({
     mutationFn: async ({ id, input }: { id?: string; input: RoomInput }) => {
+      if (!space?.id) {
+        throw new Error("SPACE_NOT_READY");
+      }
+
+      const safeName = input.name.trim();
+      if (safeName.length < 2 || safeName.length > 80) {
+        throw new Error("INVALID_ROOM_NAME");
+      }
+
+      if (!Number.isInteger(input.capacity) || input.capacity < 1 || input.capacity > 10000) {
+        throw new Error("INVALID_ROOM_CAPACITY");
+      }
+
+      const safePrice =
+        typeof input.price_per_hour === "number" && Number.isFinite(input.price_per_hour)
+          ? input.price_per_hour
+          : null;
+      if (safePrice !== null && safePrice < 0) {
+        throw new Error("INVALID_ROOM_PRICE");
+      }
+
+      const safeInput: RoomInput = {
+        ...input,
+        name: safeName,
+        price_per_hour: safePrice,
+      };
+
       // Trava do plano: só ao CRIAR unidade nova
       if (!id) {
         const limit = planLimit(space?.plan);
         const { count, error: countErr } = await supabase
           .from("rooms")
           .select("*", { count: "exact", head: true })
-          .eq("space_id", space!.id);
+          .eq("space_id", space.id);
         if (countErr) throw countErr;
         if ((count ?? 0) >= limit) {
           throw new Error(`PLAN_LIMIT:${limit}`);
@@ -56,12 +83,12 @@ export function useSaveRoom() {
       }
 
       if (id) {
-        const { error } = await supabase.from("rooms").update(input).eq("id", id);
+        const { error } = await supabase.from("rooms").update(safeInput).eq("id", id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("rooms")
-          .insert({ ...input, space_id: space!.id });
+          .insert({ ...safeInput, space_id: space.id });
         if (error) throw error;
       }
     },

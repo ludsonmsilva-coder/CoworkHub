@@ -1,8 +1,31 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "EXPO_PUBLIC_SUPABASE_URL=https://unknwtlesfalbljgekeq.supabase.co EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_ajjemB2MdBWVaQxXJkC9rA_9rLw7jI4 npm run build:web",
+  "buildCommand": "EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY=$EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_PAID_EMAIL_OVERRIDES=$EXPO_PUBLIC_PAID_EMAIL_OVERRIDES npm run build:web",
   "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",

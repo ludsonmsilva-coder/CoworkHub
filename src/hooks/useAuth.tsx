@@ -10,7 +10,20 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { Member, Space, UserRole } from "@/types";
 
-const PAID_EMAIL_OVERRIDES = new Set(["ludson.m.silva@gmail.com"]);
+function parsePaidEmailOverrides() {
+  const raw = process.env.EXPO_PUBLIC_PAID_EMAIL_OVERRIDES;
+  const fallback = "ludson.m.silva@gmail.com";
+  const source = raw && raw.trim().length > 0 ? raw : fallback;
+
+  return new Set(
+    source
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+const PAID_EMAIL_OVERRIDES = parsePaidEmailOverrides();
 
 function hasPaidOverride(email?: string | null) {
   return PAID_EMAIL_OVERRIDES.has(email?.toLowerCase() ?? "");

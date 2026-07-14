@@ -14,12 +14,22 @@ type BookingRow = {
 };
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": Deno.env.get("REMINDER_ALLOWED_ORIGIN") ?? "https://lokaro.vercel.app",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
 function sanitizeSenderName(value: string) {
   return value.replace(/[<>\"]/g, "").trim();
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function isDueNow(startsAtIso: string, reminderHours: number, now: Date, windowMinutes: number) {
@@ -52,7 +62,10 @@ Deno.serve(async (req) => {
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   const cronSecret = Deno.env.get("REMINDER_CRON_SECRET") ?? "";
   const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL") ?? "lembretes@lokaro.co";
-  const windowMinutes = Number(Deno.env.get("REMINDER_WINDOW_MINUTES") ?? "5");
+  const rawWindowMinutes = Number(Deno.env.get("REMINDER_WINDOW_MINUTES") ?? "5");
+  const windowMinutes = Number.isFinite(rawWindowMinutes)
+    ? Math.min(60, Math.max(1, rawWindowMinutes))
+    : 5;
 
   if (!supabaseUrl || !serviceRoleKey) {
     return new Response(JSON.stringify({ error: "Missing Supabase credentials" }), {
@@ -68,8 +81,16 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (!cronSecret) {
+    return new Response(JSON.stringify({ error: "Missing REMINDER_CRON_SECRET" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   if (cronSecret) {
-    const auth = req.headers.get("authorization")?.replace("Bearer ", "").trim();
+    const authHeader = req.headers.get("authorization")?.trim() ?? "";
+    const auth = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
     const secretHeader = req.headers.get("x-cron-secret")?.trim();
     if (auth !== cronSecret && secretHeader !== cronSecret) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -145,17 +166,21 @@ Deno.serve(async (req) => {
       minute: "2-digit",
       hour12: false,
     });
+    const safeMemberName = escapeHtml(member?.name ?? "cliente");
+    const safeSpaceName = escapeHtml(space?.name ?? "Lokaro");
+    const safeRoomName = escapeHtml(room?.name ?? "Sala");
+    const safeStartLabel = escapeHtml(startLabel);
 
     const subject = `Lembrete: sua reserva começa em ${booking.reminder_hours}h`;
     const html = `
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:16px;color:#0f172a">
         <h2 style="margin:0 0 12px">Lembrete de reserva</h2>
-        <p>Olá, ${member?.name ?? "cliente"}.</p>
+        <p>Olá, ${safeMemberName}.</p>
         <p>Este é um lembrete da sua reserva:</p>
         <ul>
-          <li><strong>Espaço:</strong> ${space?.name ?? "Lokaro"}</li>
-          <li><strong>Sala:</strong> ${room?.name ?? "Sala"}</li>
-          <li><strong>Início:</strong> ${startLabel}</li>
+          <li><strong>Espaço:</strong> ${safeSpaceName}</li>
+          <li><strong>Sala:</strong> ${safeRoomName}</li>
+          <li><strong>Início:</strong> ${safeStartLabel}</li>
         </ul>
         <p>Se precisar ajustar, entre em contato com o administrador do espaço.</p>
       </div>

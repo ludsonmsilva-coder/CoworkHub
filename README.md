@@ -26,6 +26,7 @@ npm install
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+EXPO_PUBLIC_PAID_EMAIL_OVERRIDES=admin1@company.com,admin2@company.com
 ```
 
 4. Start the project:
@@ -64,3 +65,18 @@ npm run build:web
 5. Use `dist` as the output directory.
 
 The included `vercel.json` already configures the build output and rewrites all routes to `index.html`, which is required for Expo Router on static hosting.
+
+## Security checklist (production)
+
+1. Configure env vars in Vercel project settings and do not hardcode credentials in the repository.
+2. Keep `EXPO_PUBLIC_SUPABASE_ANON_KEY` as publishable-only key (never service-role in client).
+3. Configure `EXPO_PUBLIC_PAID_EMAIL_OVERRIDES` only with trusted operator emails.
+4. For Edge reminders, set all required secrets (`REMINDER_CRON_SECRET`, `RESEND_API_KEY`, `REMINDER_FROM_EMAIL`).
+5. Keep RLS enabled in Supabase for all business tables (`spaces`, `members`, `rooms`, `bookings`, `leases`, `invoices`).
+
+## Quality gates
+
+```bash
+npm run typecheck
+npm run build:web
+```

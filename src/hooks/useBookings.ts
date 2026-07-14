@@ -54,6 +54,10 @@ export function useCreateBooking() {
       notes?: string;
       reminder_hours?: number | null;
     }) => {
+      if (!space?.id) {
+        throw new Error("SPACE_NOT_READY");
+      }
+
       // Horário de funcionamento da SALA (editável no cadastro da sala)
       const { data: room, error: roomErr } = await supabase
         .from("rooms")
@@ -118,7 +122,7 @@ export function useCreateBooking() {
       }
 
       const { error } = await supabase.from("bookings").insert({
-        space_id: space!.id,
+        space_id: space.id,
         room_id: input.room_id,
         member_id: input.member_id,
         starts_at: input.starts_at.toISOString(),

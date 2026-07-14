@@ -12,6 +12,7 @@ Edge Function que envia lembretes de reservas pelo Resend.
 - `RESEND_API_KEY`
 - `REMINDER_FROM_EMAIL` (ex.: lembretes@lokaro.co)
 - `REMINDER_CRON_SECRET` (string forte)
+- `REMINDER_ALLOWED_ORIGIN` (ex.: https://lokaro.vercel.app)
 
 A função também usa automaticamente:
 - `SUPABASE_URL`
@@ -19,6 +20,11 @@ A função também usa automaticamente:
 
 ## Secrets opcionais
 - `REMINDER_WINDOW_MINUTES` (default: 5)
+
+## Regras de segurança
+- A função exige `REMINDER_CRON_SECRET`; sem ele retorna erro 500 e não executa.
+- O endpoint aceita apenas `POST` e valida token em `Authorization: Bearer ...` ou `x-cron-secret`.
+- O HTML de email é sanitizado para evitar injeção de conteúdo nos campos dinâmicos.
 
 ## Deploy
 ```bash
