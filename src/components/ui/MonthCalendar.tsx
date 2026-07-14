@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useAppPreferences } from "@/hooks/useAppPreferences";
 
@@ -28,6 +28,7 @@ interface Props {
 
 export function MonthCalendar({ selected, onSelect, markedDays, onMonthChange }: Props) {
   const { language } = useAppPreferences();
+  const isWeb = Platform.OS === "web";
   const WEEKDAYS = WEEKDAYS_BY_LANG[language] ?? WEEKDAYS_BY_LANG["pt-BR"];
   const selDate = new Date(`${selected}T12:00:00`);
   const [viewYear, setViewYear] = useState(selDate.getFullYear());
@@ -66,26 +67,26 @@ export function MonthCalendar({ selected, onSelect, markedDays, onMonthChange }:
   });
 
   return (
-    <View className="bg-white rounded-2xl border border-gray-100 p-3">
+    <View className={`bg-white rounded-2xl border border-gray-100 ${isWeb ? "p-2.5" : "p-3"}`}>
       {/* Cabeçalho mês/ano */}
-      <View className="flex-row items-center justify-between mb-2">
+      <View className={`flex-row items-center justify-between ${isWeb ? "mb-1.5" : "mb-2"}`}>
         <Pressable
           onPress={() => changeMonth(-1)}
-          className="h-9 w-9 rounded-full bg-gray-100 items-center justify-center active:bg-gray-200"
+          className={`${isWeb ? "h-8 w-8" : "h-9 w-9"} rounded-full bg-gray-100 items-center justify-center active:bg-gray-200`}
         >
-          <ChevronLeft size={18} color="#3D4451" />
+          <ChevronLeft size={isWeb ? 16 : 18} color="#3D4451" />
         </Pressable>
-        <Text className="text-ink font-bold capitalize">{monthLabel}</Text>
+        <Text className={`${isWeb ? "text-base" : "text-lg"} text-ink font-bold capitalize`}>{monthLabel}</Text>
         <Pressable
           onPress={() => changeMonth(1)}
-          className="h-9 w-9 rounded-full bg-gray-100 items-center justify-center active:bg-gray-200"
+          className={`${isWeb ? "h-8 w-8" : "h-9 w-9"} rounded-full bg-gray-100 items-center justify-center active:bg-gray-200`}
         >
-          <ChevronRight size={18} color="#3D4451" />
+          <ChevronRight size={isWeb ? 16 : 18} color="#3D4451" />
         </Pressable>
       </View>
 
       {/* Dias da semana */}
-      <View className="flex-row mb-1">
+      <View className={`flex-row ${isWeb ? "mb-0.5" : "mb-1"}`}>
         {WEEKDAYS.map((w, i) => (
           <View key={i} className="flex-1 items-center">
             <Text className="text-[11px] font-semibold text-ink-low">{w}</Text>
@@ -103,10 +104,10 @@ export function MonthCalendar({ selected, onSelect, markedDays, onMonthChange }:
             const isToday = iso === todayISO;
             const hasBooking = markedDays?.has(iso) ?? false;
             return (
-              <View key={col} className="flex-1 items-center py-0.5">
+              <View key={col} className={`flex-1 items-center ${isWeb ? "py-0" : "py-0.5"}`}>
                 <Pressable
                   onPress={() => onSelect(iso)}
-                  className={`h-9 w-9 rounded-full items-center justify-center ${
+                  className={`${isWeb ? "h-8 w-8" : "h-9 w-9"} rounded-full items-center justify-center ${
                     isSel
                       ? "bg-primary"
                       : isToday && !hasBooking
@@ -124,7 +125,7 @@ export function MonthCalendar({ selected, onSelect, markedDays, onMonthChange }:
                   }
                 >
                   <Text
-                    className={`text-sm font-semibold ${
+                    className={`${isWeb ? "text-xs" : "text-sm"} font-semibold ${
                       isSel ? "text-white" : isToday && !hasBooking ? "text-primary" : "text-ink"
                     }`}
                     style={!isSel && hasBooking ? { color: "#0D9488" } : undefined}
@@ -133,10 +134,10 @@ export function MonthCalendar({ selected, onSelect, markedDays, onMonthChange }:
                   </Text>
                   <View
                     style={{
-                      height: 5,
-                      width: 5,
+                      height: isWeb ? 4 : 5,
+                      width: isWeb ? 4 : 5,
                       borderRadius: 3,
-                      marginTop: 1,
+                      marginTop: isWeb ? 0 : 1,
                       backgroundColor: hasBooking
                         ? isSel
                           ? "#FFFFFF"
