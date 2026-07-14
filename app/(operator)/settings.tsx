@@ -241,7 +241,7 @@ export default function SettingsScreen() {
           <Text className={`font-medium mb-1.5 text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>
             {t("settings.theme")}
           </Text>
-          <View className="flex-row gap-2 mb-4">
+          <View className="flex-row flex-wrap gap-2 mb-4">
             {themeOptions.map((item) => {
               const selected = item.value === theme;
               return (
@@ -250,7 +250,7 @@ export default function SettingsScreen() {
                   onPress={() => {
                     void setTheme(item.value);
                   }}
-                  className={`px-4 py-2 rounded-full border ${
+                  className={`px-4 py-2 rounded-full border min-w-[104px] items-center ${
                     selected
                       ? "bg-primary border-primary"
                       : isDark
@@ -280,7 +280,7 @@ export default function SettingsScreen() {
           <Text className={`font-medium mb-1.5 text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>
             {t("settings.language")}
           </Text>
-          <View className="flex-row gap-2">
+          <View className="flex-row flex-wrap gap-2">
             {languageOptions.map((item) => {
               const selected = item.value === language;
               return (
@@ -289,7 +289,7 @@ export default function SettingsScreen() {
                   onPress={() => {
                     void setLanguage(item.value);
                   }}
-                  className={`px-4 py-2 rounded-full border ${
+                  className={`px-4 py-2 rounded-full border min-w-[104px] items-center ${
                     selected
                       ? "bg-primary border-primary"
                       : isDark
