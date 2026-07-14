@@ -210,7 +210,8 @@ export default function Dashboard() {
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
       >
-        <View className="px-5 pt-2 pb-5">
+        <View className="px-4 md:px-6 pt-2 pb-5">
+          <View className="w-full max-w-6xl self-center">
           <View
             className={`rounded-[28px] overflow-hidden border px-4 pt-4 pb-4 ${
               isDark ? "bg-[#10233A] border-cyan-400/30" : "bg-[#DFF2FF] border-[#B7E3FB]"
@@ -249,7 +250,7 @@ export default function Dashboard() {
               </View>
             </View>
 
-            <View className="flex-row gap-3 mt-4">
+            <View className="flex-row flex-wrap gap-3 mt-4">
               <QuickAction
                 label={t("dashboard.ctaBookings")}
                 onPress={() => router.push("/(operator)/bookings")}
@@ -262,16 +263,20 @@ export default function Dashboard() {
               />
             </View>
           </View>
+          </View>
         </View>
 
-        <View className="px-5">
-          <Text className={`text-sm font-semibold mb-3 ${isDark ? "text-slate-300" : "text-ink"}`}>
-            {t("dashboard.focus")}
-          </Text>
+        <View className="px-4 md:px-6">
+          <View className="w-full max-w-6xl self-center">
+            <Text className={`text-sm font-semibold mb-3 ${isDark ? "text-slate-300" : "text-ink"}`}>
+              {t("dashboard.focus")}
+            </Text>
+          </View>
         </View>
 
-        <View className="px-5 flex-row flex-wrap justify-between">
-          <KpiCard
+        <View className="px-4 md:px-6">
+          <View className="w-full max-w-6xl self-center flex-row flex-wrap justify-between">
+            <KpiCard
             icon={Users}
             label={t("dashboard.activeMembers")}
             value={members}
@@ -316,14 +321,17 @@ export default function Dashboard() {
             bg="#FEF2F2"
             isDark={isDark}
             onPress={() => router.push("/(operator)/finance")}
-          />
+            />
+          </View>
         </View>
 
-        <View className={`mx-5 mt-2 rounded-3xl p-4 ${isDark ? "bg-card-dark border border-border-dark" : "bg-white border border-gray-100"}`}>
-          <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`}>{t("dashboard.nextSteps")}</Text>
-          <Text className={`text-sm mt-2 leading-6 ${isDark ? "text-slate-300" : "text-ink-mid"}`}>
-            {t("dashboard.nextStepsDesc")}
-          </Text>
+        <View className="px-4 md:px-6 mt-2">
+          <View className={`w-full max-w-6xl self-center rounded-3xl p-4 ${isDark ? "bg-card-dark border border-border-dark" : "bg-white border border-gray-100"}`}>
+            <Text className={`font-semibold ${isDark ? "text-slate-100" : "text-ink"}`}>{t("dashboard.nextSteps")}</Text>
+            <Text className={`text-sm mt-2 leading-6 ${isDark ? "text-slate-300" : "text-ink-mid"}`}>
+              {t("dashboard.nextStepsDesc")}
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

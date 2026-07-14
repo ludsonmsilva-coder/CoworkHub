@@ -157,7 +157,7 @@ export default function Bookings() {
       <ScreenHeader title={t("bookings.title")} subtitle={t("bookings.subtitle")} />
 
       {/* Alternador Agenda / Salas */}
-      <View className={`mx-5 mb-3 flex-row rounded-2xl p-1 ${isDark ? "bg-slate-800" : "bg-gray-100"}`}>
+      <View className={`mx-4 md:mx-6 mb-3 flex-row rounded-2xl p-1 ${isDark ? "bg-slate-800" : "bg-gray-100"}`}>
         {(
           [
             { key: "agenda", label: t("bookings.tab.agenda") },
@@ -196,7 +196,7 @@ export default function Bookings() {
             ListHeaderComponent={
               <View className="pt-1">
           {/* Calendário com mês e ano */}
-          <View className="px-5 mb-3">
+          <View className="px-4 md:px-6 mb-3">
             <MonthCalendar
               selected={selectedDay}
               onSelect={(iso) => {
@@ -209,12 +209,12 @@ export default function Bookings() {
           </View>
 
           {/* Filtros rápidos da agenda */}
-          <View className="px-5 mb-2">
+          <View className="px-4 md:px-6 mb-2">
             <Text className={`text-xs tracking-wide uppercase font-semibold ${isDark ? "text-slate-500" : "text-ink-low"}`}>
               {t("bookings.filters")}
             </Text>
           </View>
-          <View className="mb-3 px-5 flex-row flex-wrap gap-2">
+          <View className="mb-3 px-4 md:px-6 flex-row flex-wrap gap-2">
             <Pressable
               onPress={() => setRoomFilter("all")}
               className={`px-3 py-2 rounded-full border ${
@@ -256,7 +256,7 @@ export default function Bookings() {
             })}
           </View>
 
-          <View className="mb-3 px-5 flex-row flex-wrap gap-2">
+          <View className="mb-3 px-4 md:px-6 flex-row flex-wrap gap-2">
             <Pressable
               onPress={() => setMemberFilter("all")}
               className={`px-3 py-2 rounded-full border ${
@@ -295,7 +295,7 @@ export default function Bookings() {
           </View>
 
           {/* Ocupação das salas no dia */}
-          <View className="px-5 mb-2">
+          <View className="px-4 md:px-6 mb-2">
             <Text className={`text-xs tracking-wide uppercase font-semibold ${isDark ? "text-slate-500" : "text-ink-low"}`}>
               {t("bookings.dayOccupancy")}
             </Text>
@@ -304,7 +304,7 @@ export default function Bookings() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerClassName="px-5 gap-2"
+              contentContainerClassName="px-4 md:px-6 gap-2"
             >
               {roomUtilization.map(({ room, usedMinutes, percent }) => (
                 <View
@@ -343,7 +343,7 @@ export default function Bookings() {
               return (
                 <Pressable
                   onLongPress={() => confirmCancel(item.id)}
-                  className={`mx-5 rounded-2xl p-4 mb-3 border flex-row items-center ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
+                  className={`mx-4 md:mx-6 rounded-2xl p-4 mb-3 border flex-row items-center ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
                   style={({ pressed }) =>
                     pressed
                       ? {
@@ -423,7 +423,7 @@ export default function Bookings() {
           <FlatList
             data={rooms ?? []}
             keyExtractor={(item) => item.id}
-            contentContainerClassName="px-5 pb-32 flex-grow"
+            contentContainerClassName="px-4 md:px-6 pb-32 flex-grow"
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => {
