@@ -4,6 +4,7 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
+  Platform,
   ScrollView,
   Text,
   View,
@@ -300,37 +301,67 @@ export default function Bookings() {
               {t("bookings.dayOccupancy")}
             </Text>
           </View>
-          <View className="mb-3">
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="px-4 md:px-6 gap-2"
-            >
-              {roomUtilization.map(({ room, usedMinutes, percent }) => (
-                <View
-                  key={room.id}
-                  className={`w-44 rounded-2xl border p-3 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
-                >
-                  <View className="flex-row items-center justify-between">
-                    <Text className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
-                      {room.name}
+          <View className="mb-3 px-4 md:px-6">
+            {Platform.OS === "web" ? (
+              <View className="flex-row flex-wrap gap-2">
+                {roomUtilization.map(({ room, usedMinutes, percent }) => (
+                  <View
+                    key={room.id}
+                    className={`rounded-2xl border p-3 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
+                    style={{ width: "48%", minWidth: 220 }}
+                  >
+                    <View className="flex-row items-center justify-between">
+                      <Text className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
+                        {room.name}
+                      </Text>
+                      <Text className="text-xs font-semibold" style={{ color: room.color }}>
+                        {percent}%
+                      </Text>
+                    </View>
+                    <Text className={`text-[11px] mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
+                      {Math.floor(usedMinutes / 60)}h {usedMinutes % 60}m {t("bookings.reserved")}
                     </Text>
-                    <Text className="text-xs font-semibold" style={{ color: room.color }}>
-                      {percent}%
+                    <View className={`h-2 rounded-full mt-2 overflow-hidden ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
+                      <View
+                        className="h-2 rounded-full"
+                        style={{ width: `${percent}%`, backgroundColor: room.color }}
+                      />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerClassName="px-4 md:px-6 gap-2"
+              >
+                {roomUtilization.map(({ room, usedMinutes, percent }) => (
+                  <View
+                    key={room.id}
+                    className={`w-44 rounded-2xl border p-3 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}
+                  >
+                    <View className="flex-row items-center justify-between">
+                      <Text className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-ink"}`} numberOfLines={1}>
+                        {room.name}
+                      </Text>
+                      <Text className="text-xs font-semibold" style={{ color: room.color }}>
+                        {percent}%
+                      </Text>
+                    </View>
+                    <Text className={`text-[11px] mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
+                      {Math.floor(usedMinutes / 60)}h {usedMinutes % 60}m {t("bookings.reserved")}
                     </Text>
+                    <View className={`h-2 rounded-full mt-2 overflow-hidden ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
+                      <View
+                        className="h-2 rounded-full"
+                        style={{ width: `${percent}%`, backgroundColor: room.color }}
+                      />
+                    </View>
                   </View>
-                  <Text className={`text-[11px] mt-0.5 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
-                    {Math.floor(usedMinutes / 60)}h {usedMinutes % 60}m {t("bookings.reserved")}
-                  </Text>
-                  <View className={`h-2 rounded-full mt-2 overflow-hidden ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
-                    <View
-                      className="h-2 rounded-full"
-                      style={{ width: `${percent}%`, backgroundColor: room.color }}
-                    />
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
+                ))}
+              </ScrollView>
+            )}
           </View>
 
               </View>

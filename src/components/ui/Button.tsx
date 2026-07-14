@@ -19,7 +19,7 @@ export function Button({
   const { isDark } = useAppPreferences();
   const isDisabled = disabled || loading;
 
-  const base = "h-14 rounded-2xl items-center justify-center w-full";
+  const base = "h-14 rounded-2xl items-center justify-center w-full md:max-w-md md:self-center";
   const styles = {
     primary: `${base} bg-primary ${isDisabled ? "opacity-50" : "active:bg-primary-dark"}`,
     outline: `${base} border-2 border-primary bg-transparent ${isDisabled ? "opacity-50" : ""}`,
