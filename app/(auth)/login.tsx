@@ -47,10 +47,11 @@ export default function Login() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
-          contentContainerClassName="flex-grow justify-center px-8"
+          contentContainerClassName="flex-grow justify-center px-6 md:px-8 py-8"
           keyboardShouldPersistTaps="handled"
         >
-          <View className="items-center mb-10">
+          <View className="w-full max-w-md self-center">
+            <View className="items-center mb-10">
             <LokaroLogo size={58} showWordmark={false} dark={isDark} />
             <Text className={`text-2xl font-bold mt-4 ${isDark ? "text-slate-100" : "text-ink"}`}>
               {t("auth.login.title")}
@@ -58,31 +59,32 @@ export default function Login() {
             <Text className={`${isDark ? "text-slate-400" : "text-ink-low"} mt-1`}>
               {t("auth.login.subtitle")}
             </Text>
-          </View>
+            </View>
 
-          <Input
-            label="Email"
-            placeholder="voce@exemplo.com"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <Input
-            label={t("auth.password")}
-            placeholder={t("auth.yourPassword")}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <View className="mt-2 gap-3">
-            <Button title={t("auth.login.submit")} onPress={handleLogin} loading={loading} />
-            <Button
-              title={t("auth.login.signup")}
-              variant="ghost"
-              onPress={() => router.replace("/(auth)/signup")}
+            <Input
+              label="Email"
+              placeholder="voce@exemplo.com"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
             />
+            <Input
+              label={t("auth.password")}
+              placeholder={t("auth.yourPassword")}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <View className="mt-2 gap-3">
+              <Button title={t("auth.login.submit")} onPress={handleLogin} loading={loading} />
+              <Button
+                title={t("auth.login.signup")}
+                variant="ghost"
+                onPress={() => router.replace("/(auth)/signup")}
+              />
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

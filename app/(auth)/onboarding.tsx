@@ -95,95 +95,97 @@ export default function Onboarding() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView contentContainerClassName="flex-grow px-8 pt-6 pb-10">
-        {/* Indicador de progresso */}
-        <View className="flex-row gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
-            <View
-              key={s}
-              className={`h-1.5 flex-1 rounded-full ${
-                s <= step ? "bg-primary" : "bg-gray-200"
-              }`}
-            />
-          ))}
-        </View>
-
-        {step === 1 && (
-          <View className="flex-1">
-            <Text className="text-2xl font-bold text-ink mb-1">
-              {t("onboarding.step1Title")}
-            </Text>
-            <Text className="text-ink-low mb-6">
-              {t("onboarding.step1Desc")}
-            </Text>
-            <Input
-              label={t("onboarding.spaceName")}
-              placeholder={t("onboarding.spaceNamePlaceholder")}
-              value={spaceName}
-              onChangeText={setSpaceName}
-            />
-            <Button
-              title={t("common.continue")}
-              onPress={() => {
-                if (spaceName.trim().length < 3) {
-                  showAlert(t("common.attention"), t("onboarding.nameTooShort"));
-                  return;
-                }
-                setStep(2);
-              }}
-            />
-          </View>
-        )}
-
-        {step === 2 && (
-          <View className="flex-1">
-            <Text className="text-2xl font-bold text-ink mb-1">
-              {t("onboarding.step2Title")}
-            </Text>
-            <Text className="text-ink-low mb-6">
-              {t("onboarding.step2Desc")}
-            </Text>
-            {TIMEZONES.map((tz) => (
-              <OptionRow
-                key={tz.value}
-                label={tz.label}
-                selected={timezone === tz.value}
-                onPress={() => setTimezone(tz.value)}
+      <ScrollView contentContainerClassName="flex-grow px-6 md:px-8 pt-6 pb-10">
+        <View className="w-full max-w-lg self-center">
+          {/* Indicador de progresso */}
+          <View className="flex-row gap-2 mb-8">
+            {[1, 2, 3].map((s) => (
+              <View
+                key={s}
+                className={`h-1.5 flex-1 rounded-full ${
+                  s <= step ? "bg-primary" : "bg-gray-200"
+                }`}
               />
             ))}
-            <View className="mt-4 gap-3">
-              <Button title={t("common.continue")} onPress={() => setStep(3)} />
-              <Button title={t("common.back")} variant="ghost" onPress={() => setStep(1)} />
-            </View>
           </View>
-        )}
 
-        {step === 3 && (
-          <View className="flex-1">
-            <Text className="text-2xl font-bold text-ink mb-1">
-              {t("onboarding.step3Title")}
-            </Text>
-            <Text className="text-ink-low mb-6">
-              {t("onboarding.step3Desc")}
-            </Text>
-            {CURRENCIES.map((c) => (
-              <OptionRow
-                key={c.value}
-                label={c.label}
-                selected={currency === c.value}
-                onPress={() => setCurrency(c.value)}
+          {step === 1 && (
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-ink mb-1">
+                {t("onboarding.step1Title")}
+              </Text>
+              <Text className="text-ink-low mb-6">
+                {t("onboarding.step1Desc")}
+              </Text>
+              <Input
+                label={t("onboarding.spaceName")}
+                placeholder={t("onboarding.spaceNamePlaceholder")}
+                value={spaceName}
+                onChangeText={setSpaceName}
               />
-            ))}
-            <View className="mt-4 gap-3">
               <Button
-                title={t("onboarding.finish")}
-                onPress={handleFinish}
-                loading={loading}
+                title={t("common.continue")}
+                onPress={() => {
+                  if (spaceName.trim().length < 3) {
+                    showAlert(t("common.attention"), t("onboarding.nameTooShort"));
+                    return;
+                  }
+                  setStep(2);
+                }}
               />
-              <Button title={t("common.back")} variant="ghost" onPress={() => setStep(2)} />
             </View>
-          </View>
-        )}
+          )}
+
+          {step === 2 && (
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-ink mb-1">
+                {t("onboarding.step2Title")}
+              </Text>
+              <Text className="text-ink-low mb-6">
+                {t("onboarding.step2Desc")}
+              </Text>
+              {TIMEZONES.map((tz) => (
+                <OptionRow
+                  key={tz.value}
+                  label={tz.label}
+                  selected={timezone === tz.value}
+                  onPress={() => setTimezone(tz.value)}
+                />
+              ))}
+              <View className="mt-4 gap-3">
+                <Button title={t("common.continue")} onPress={() => setStep(3)} />
+                <Button title={t("common.back")} variant="ghost" onPress={() => setStep(1)} />
+              </View>
+            </View>
+          )}
+
+          {step === 3 && (
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-ink mb-1">
+                {t("onboarding.step3Title")}
+              </Text>
+              <Text className="text-ink-low mb-6">
+                {t("onboarding.step3Desc")}
+              </Text>
+              {CURRENCIES.map((c) => (
+                <OptionRow
+                  key={c.value}
+                  label={c.label}
+                  selected={currency === c.value}
+                  onPress={() => setCurrency(c.value)}
+                />
+              ))}
+              <View className="mt-4 gap-3">
+                <Button
+                  title={t("onboarding.finish")}
+                  onPress={handleFinish}
+                  loading={loading}
+                />
+                <Button title={t("common.back")} variant="ghost" onPress={() => setStep(2)} />
+              </View>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
