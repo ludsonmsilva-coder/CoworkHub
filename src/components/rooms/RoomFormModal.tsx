@@ -20,6 +20,7 @@ import { showAlert, showConfirm } from "@/utils/alert";
 import { useAppPreferences } from "@/hooks/useAppPreferences";
 
 const TYPES: RoomType[] = ["meeting_room", "hot_desk", "private_office", "house", "kitnet", "apartment"];
+const MONTHLY_TYPES: RoomType[] = ["house", "kitnet", "apartment"];
 
 const COLORS = [
   "#2563EB", "#059669", "#DC2626", "#D97706",
@@ -71,6 +72,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
   const [is24h, setIs24h] = useState(false);
   const [openTime, setOpenTime] = useState("07:00");
   const [closeTime, setCloseTime] = useState("21:00");
+  const isMonthlyPrice = MONTHLY_TYPES.includes(type);
 
   useEffect(() => {
     if (visible) {
@@ -134,7 +136,9 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <View className={`rounded-t-3xl max-h-[90%] ${isDark ? "bg-paper-dark" : "bg-white"}`}>
+          <View
+            className={`max-h-[90%] ${Platform.OS === "web" ? "w-[96%] max-w-4xl self-center mb-4 rounded-3xl" : "rounded-t-3xl"} ${isDark ? "bg-paper-dark" : "bg-white"}`}
+          >
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-ink"}`}>
                 {isEdit ? t("room.modal.edit") : t("room.modal.new")}
@@ -173,6 +177,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
                             ? "bg-card-dark border-border-dark"
                             : "bg-white border-gray-200"
                       }`}
+                      style={Platform.OS === "web" ? { minWidth: 150, alignItems: "center" } : undefined}
                     >
                       <Text className={`text-sm font-medium ${sel ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
                         {t(`roomType.${opt}`)}
@@ -193,7 +198,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
                 </View>
                 <View className="flex-1">
                   <Input
-                    label={t("room.pricePerHour")}
+                    label={t(isMonthlyPrice ? "room.pricePerMonth" : "room.pricePerHour")}
                     placeholder={t("room.optional")}
                     keyboardType="decimal-pad"
                     value={price}
