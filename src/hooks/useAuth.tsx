@@ -12,6 +12,10 @@ import type { Member, Space, UserRole } from "@/types";
 
 const PAID_EMAIL_OVERRIDES = new Set(["ludson.m.silva@gmail.com"]);
 
+function hasPaidOverride(email?: string | null) {
+  return PAID_EMAIL_OVERRIDES.has(email?.toLowerCase() ?? "");
+}
+
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
@@ -32,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadProfile = useCallback(async (userId: string | undefined) => {
+  const loadProfile = useCallback(async (userId: string | undefined, userEmail?: string | null) => {
     if (!userId) {
       setSpace(null);
       setMember(null);
@@ -49,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (ownedSpace) {
       const nextSpace = ownedSpace as Space;
-      if (PAID_EMAIL_OVERRIDES.has(session?.user?.email?.toLowerCase() ?? "")) {
+      if (hasPaidOverride(userEmail)) {
         nextSpace.plan = "pro";
       }
       setSpace(nextSpace);
@@ -66,15 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (memberRow) {
-      setMember(memberRow as Member);
-      setRole("member");
+      const paidOverride = hasPaidOverride(userEmail);
+      setMember(paidOverride ? null : (memberRow as Member));
+      setRole(paidOverride ? "operator" : "member");
       const { data: memberSpace } = await supabase
         .from("spaces")
         .select("*")
         .eq("id", (memberRow as Member).space_id)
         .maybeSingle();
       const nextSpace = (memberSpace as Space) ?? null;
-      if (nextSpace && PAID_EMAIL_OVERRIDES.has(session?.user?.email?.toLowerCase() ?? "")) {
+      if (nextSpace && paidOverride) {
         nextSpace.plan = "pro";
       }
       setSpace(nextSpace);
@@ -90,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     const { data } = await supabase.auth.getSession();
     setSession(data.session);
-    await loadProfile(data.session?.user?.id);
+    await loadProfile(data.session?.user?.id, data.session?.user?.email ?? null);
   }, [loadProfile]);
 
   useEffect(() => {
@@ -99,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
         setSession(newSession);
-        await loadProfile(newSession?.user?.id);
+        await loadProfile(newSession?.user?.id, newSession?.user?.email ?? null);
         setIsLoading(false);
       }
     );
