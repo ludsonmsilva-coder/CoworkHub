@@ -1,5 +1,10 @@
-"web": {
-  "favicon": "./assets/favicon.png",
-  "bundler": "metro",
-  "output": "single"
+{
+  "buildCommand": "npm run build:web",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
