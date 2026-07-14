@@ -10,17 +10,19 @@ export default function Welcome() {
 
   return (
     <SafeAreaView className={`flex-1 ${isDark ? "bg-paper-dark" : "bg-white"}`}>
-      <View className="flex-1 items-center justify-center px-8">
+      <View className="flex-1 items-center justify-center px-6 md:px-8">
+        <View className="w-full max-w-md items-center">
         <LokaroLogo
           size={72}
           subtitle={isDark ? "Workspace operations" : "Gestão de coworking"}
           dark={isDark}
         />
-        <Text className={`text-base text-center mt-4 leading-6 max-w-[320px] ${isDark ? "text-slate-300" : "text-ink-low"}`}>
-          {t("auth.welcome.subtitle")}
-        </Text>
+          <Text className={`text-base text-center mt-4 leading-6 max-w-[320px] ${isDark ? "text-slate-300" : "text-ink-low"}`}>
+            {t("auth.welcome.subtitle")}
+          </Text>
+        </View>
       </View>
-      <View className="px-8 pb-10 gap-3">
+      <View className="w-full max-w-md self-center px-6 md:px-8 pb-10 gap-3">
         <Button title={t("auth.welcome.signup")} onPress={() => router.push("/(auth)/signup")} />
         <Button
           title={t("auth.welcome.login")}
