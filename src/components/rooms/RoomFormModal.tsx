@@ -132,12 +132,14 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="flex-1 bg-black/40 justify-end">
+      <View className={`flex-1 bg-black/40 ${Platform.OS === "web" ? "justify-center" : "justify-end"}`}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1, justifyContent: Platform.OS === "web" ? "center" : "flex-end" }}
         >
           <View
-            className={`max-h-[90%] ${Platform.OS === "web" ? "w-[96%] max-w-4xl self-center mb-4 rounded-3xl" : "rounded-t-3xl"} ${isDark ? "bg-paper-dark" : "bg-white"}`}
+            className={`${Platform.OS === "web" ? "w-[95%] max-w-3xl self-center rounded-3xl" : "max-h-[90%] rounded-t-3xl"} overflow-hidden ${isDark ? "bg-paper-dark" : "bg-white"}`}
+            style={Platform.OS === "web" ? { maxHeight: "92vh" } : undefined}
           >
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-ink"}`}>
@@ -152,8 +154,10 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
             </View>
 
             <ScrollView
-              contentContainerClassName="px-5 pb-8"
+              className="flex-1"
+              contentContainerClassName="px-5 pb-6"
               keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator
             >
               <Input
                 label={t("room.name")}
@@ -177,7 +181,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
                             ? "bg-card-dark border-border-dark"
                             : "bg-white border-gray-200"
                       }`}
-                      style={Platform.OS === "web" ? { minWidth: 150, alignItems: "center" } : undefined}
+                      style={Platform.OS === "web" ? { minWidth: 128, alignItems: "center" } : undefined}
                     >
                       <Text className={`text-sm font-medium ${sel ? "text-white" : isDark ? "text-slate-300" : "text-ink-mid"}`}>
                         {t(`roomType.${opt}`)}
@@ -187,7 +191,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
                 })}
               </View>
 
-              <View className="flex-row gap-3">
+              <View className="flex-col md:flex-row gap-3">
                 <View className="flex-1">
                   <Input
                     label={t("room.capacity")}
@@ -239,7 +243,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
                 />
               </View>
               {!is24h ? (
-                <View className="flex-row gap-3 mb-1">
+                <View className="flex-col md:flex-row gap-3 mb-1">
                   <View className="flex-1">
                     <Input
                       label={t("room.opensAt")}
