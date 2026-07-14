@@ -128,9 +128,13 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView className={`flex-1 ${isDark ? "bg-paper-dark" : "bg-paper"}`} edges={["top"]}>
       <ScreenHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
-      <ScrollView contentContainerClassName="px-5 pb-8">
-        <PlanCard />
-        <EmailSenderCard />
+      <ScrollView contentContainerClassName="px-4 md:px-6 pb-8">
+        <View className="w-full max-w-5xl self-center">
+          <PlanCard />
+          <EmailSenderCard />
+
+          <View className="md:flex-row md:gap-4">
+            <View className="flex-1">
         <View className={`rounded-2xl p-4 border mb-4 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}>
           <Text className={`text-sm font-semibold mb-2 ${isDark ? "text-slate-100" : "text-ink"}`}>
             {t("settings.branding")}
@@ -314,6 +318,9 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+            </View>
+          </View>
+
         <View className={`rounded-2xl p-4 border mb-4 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-100"}`}>
           <Text className={`text-xs mb-1 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
             {t("settings.loggedAccount")}
@@ -355,6 +362,7 @@ export default function SettingsScreen() {
         </View>
 
         <Button title={t("common.signOut")} variant="outline" onPress={signOut} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
