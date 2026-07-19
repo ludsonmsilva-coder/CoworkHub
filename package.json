@@ -10,7 +10,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "expo export --platform web",
+    "build:web": "expo export --platform web && node scripts/fix-web-index.cjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
