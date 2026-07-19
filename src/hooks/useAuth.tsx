@@ -12,8 +12,7 @@ import type { Member, Space, UserRole } from "@/types";
 
 function parsePaidEmailOverrides() {
   const raw = process.env.EXPO_PUBLIC_PAID_EMAIL_OVERRIDES;
-  const fallback = "ludson.m.silva@gmail.com";
-  const source = raw && raw.trim().length > 0 ? raw : fallback;
+  const source = raw && raw.trim().length > 0 ? raw : "";
 
   return new Set(
     source
