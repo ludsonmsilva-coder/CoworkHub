@@ -11,6 +11,17 @@ import {
 
 // Web: interface de app não deve ter texto selecionável (campos de digitação continuam normais)
 if (Platform.OS === "web" && typeof document !== "undefined") {
+  document.documentElement.lang = "pt-BR";
+  document.documentElement.setAttribute("translate", "no");
+
+  const googleNotranslateMeta = document.querySelector('meta[name="google"]');
+  if (!googleNotranslateMeta) {
+    const meta = document.createElement("meta");
+    meta.setAttribute("name", "google");
+    meta.setAttribute("content", "notranslate");
+    document.head.appendChild(meta);
+  }
+
   const style = document.createElement("style");
   style.textContent = `
     body { user-select: none; -webkit-user-select: none; }
