@@ -16,6 +16,7 @@ import {
   Clock3,
   Plus,
   RotateCw,
+  Trash2,
   Wallet,
   X,
 } from "lucide-react-native";
@@ -119,6 +120,14 @@ function normalizeIsoDateOnBlur(value: string) {
 
   return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
+
+type ExpenseItem = {
+  id: string;
+  room: string;
+  description: string;
+  amount: number;
+  created_at: string;
+};
 
 function KpiCard({
   icon: Icon,
@@ -230,6 +239,12 @@ export default function Finance() {
   const [autoStartDate, setAutoStartDate] = useState(todayISO());
   const [autoEndDate, setAutoEndDate] = useState(todayISO());
   const [autoFeedback, setAutoFeedback] = useState<string | null>(null);
+  const [expenseOpen, setExpenseOpen] = useState(false);
+  const [expenseRoom, setExpenseRoom] = useState("");
+  const [expenseDescription, setExpenseDescription] = useState("");
+  const [expenseAmountInput, setExpenseAmountInput] = useState("");
+  const [expenseFeedback, setExpenseFeedback] = useState<string | null>(null);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
 
   const { data: invoices, refetch, isRefetching, isLoading } = useInvoices(statusFilter);
   const { data: kpis } = useInvoiceKpis();
@@ -404,6 +419,57 @@ export default function Finance() {
     );
   }
 
+  function resetExpenseForm() {
+    setExpenseRoom("");
+    setExpenseDescription("");
+    setExpenseAmountInput("");
+  }
+
+  function handleCreateExpense() {
+    const room = expenseRoom.trim();
+    const desc = expenseDescription.trim();
+    const amount = Number(expenseAmountInput.replace(",", "."));
+
+    if (!room) {
+      setExpenseFeedback("Informe a sala da despesa.");
+      return;
+    }
+
+    if (!desc) {
+      setExpenseFeedback("Informe a descrição da despesa.");
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setExpenseFeedback("Informe um valor válido maior que zero.");
+      return;
+    }
+
+    const item: ExpenseItem = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      room,
+      description: desc,
+      amount,
+      created_at: new Date().toISOString(),
+    };
+
+    setExpenses((prev) => [item, ...prev]);
+    setExpenseFeedback(`Despesa adicionada em ${room}.`);
+    resetExpenseForm();
+  }
+
+  function handleDeleteExpense(id: string) {
+    setExpenses((prev) => prev.filter((item) => item.id !== id));
+    setExpenseFeedback("Despesa apagada.");
+  }
+
+  const expenseTotalsByRoom = expenses.reduce<Record<string, number>>((acc, item) => {
+    acc[item.room] = (acc[item.room] ?? 0) + item.amount;
+    return acc;
+  }, {});
+
+  const expenseTotalsRows = Object.entries(expenseTotalsByRoom).sort((a, b) => b[1] - a[1]);
+
   return (
     <SafeAreaView className={`flex-1 ${isDark ? "bg-paper-dark" : "bg-paper"}`} edges={["top"]}>
       <ScreenHeader title={t("finance.title")} subtitle={t("finance.subtitle")} />
@@ -492,6 +558,29 @@ export default function Finance() {
         </Pressable>
 
         <Pressable
+          onPress={() => {
+            setExpenseOpen((prev) => !prev);
+            setExpenseFeedback(null);
+          }}
+          className={`h-11 px-4 rounded-xl border items-center justify-center flex-row ${
+            isDark
+              ? "bg-card-dark border-border-dark active:bg-slate-800"
+              : "bg-white border-gray-200 active:bg-gray-50"
+          }`}
+          style={({ pressed }) =>
+            pressed
+              ? {
+                  transform: [{ scale: 0.985 }],
+                  opacity: 0.95,
+                }
+              : undefined
+          }
+        >
+          <Plus size={16} color="#0E4A7A" />
+          <Text className="text-primary font-semibold ml-1.5">Nova despesa</Text>
+        </Pressable>
+
+        <Pressable
           onPress={confirmCleanupDuplicates}
           disabled={cleanupDuplicates.isPending}
           className={`h-11 px-4 rounded-xl border items-center justify-center flex-row ${
@@ -517,6 +606,112 @@ export default function Finance() {
           </Text>
         </Pressable>
       </View>
+
+      {expenseOpen ? (
+        <View className="px-5 mb-3">
+          <View className={`rounded-2xl border p-3 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-200"}`}>
+            <Text className={`font-semibold mb-2 ${isDark ? "text-slate-100" : "text-ink"}`}>Despesas por sala</Text>
+
+            <TextInput
+              className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
+              placeholder="Sala (ex.: Sala A)"
+              placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
+              value={expenseRoom}
+              onChangeText={setExpenseRoom}
+            />
+
+            <View className="flex-row">
+              <View className="flex-1 mr-1.5">
+                <TextInput
+                  className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
+                  placeholder="Valor da despesa"
+                  placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
+                  value={expenseAmountInput}
+                  onChangeText={setExpenseAmountInput}
+                  keyboardType="numbers-and-punctuation"
+                />
+              </View>
+              <View className="flex-1 ml-1.5">
+                <TextInput
+                  className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
+                  placeholder="Descrição"
+                  placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
+                  value={expenseDescription}
+                  onChangeText={setExpenseDescription}
+                />
+              </View>
+            </View>
+
+            <Pressable
+              onPress={handleCreateExpense}
+              className="h-10 px-4 rounded-xl bg-primary items-center justify-center self-start active:bg-primary-dark"
+              style={({ pressed }) =>
+                pressed
+                  ? {
+                      transform: [{ scale: 0.985 }],
+                      opacity: 0.95,
+                    }
+                  : undefined
+              }
+            >
+              <Text className="text-white font-semibold">Salvar despesa</Text>
+            </Pressable>
+
+            {expenseFeedback ? (
+              <Text className={`text-xs mt-2 ${isDark ? "text-slate-400" : "text-ink-low"}`}>{expenseFeedback}</Text>
+            ) : null}
+
+            <View className="mt-3">
+              {expenseTotalsRows.length === 0 ? (
+                <View className={`rounded-xl border px-3 py-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}>
+                  <Text className={`text-xs ${isDark ? "text-slate-400" : "text-ink-low"}`}>Sem despesas cadastradas ainda.</Text>
+                </View>
+              ) : (
+                expenseTotalsRows.map(([room, total]) => (
+                  <View
+                    key={`expense-total-${room}`}
+                    className={`rounded-xl border px-3 py-2 mb-2 flex-row items-center justify-between ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}
+                  >
+                    <Text className={`text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>{room}</Text>
+                    <Text className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-ink"}`}>
+                      {formatMoney(total, space?.currency ?? "USD", language)}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </View>
+
+            {expenses.length > 0 ? (
+              <View className="mt-1">
+                {expenses.map((item) => {
+                  const dateText = new Date(item.created_at).toLocaleDateString(language);
+                  return (
+                    <View
+                      key={item.id}
+                      className={`rounded-xl border px-3 py-2 mb-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}
+                    >
+                      <View className="flex-row items-center justify-between">
+                        <Text className={`text-xs flex-1 mr-2 ${isDark ? "text-slate-300" : "text-ink-mid"}`} numberOfLines={1}>
+                          {item.room} · {item.description} · {dateText}
+                        </Text>
+                        <Text className={`text-xs font-semibold mr-2 ${isDark ? "text-slate-100" : "text-ink"}`}>
+                          {formatMoney(item.amount, space?.currency ?? "USD", language)}
+                        </Text>
+                        <Pressable
+                          onPress={() => handleDeleteExpense(item.id)}
+                          className="h-7 w-7 rounded-full items-center justify-center bg-danger/10"
+                        >
+                          <Trash2 size={14} color="#DC2626" />
+                        </Pressable>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            ) : null}
+          </View>
+        </View>
+      ) : null}
 
       <View className="px-5 mb-3">
         <Text className={`font-medium mb-1.5 text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>

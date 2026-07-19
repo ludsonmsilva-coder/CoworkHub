@@ -8,6 +8,7 @@ import {
   ScrollView,
   Switch,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { X } from "lucide-react-native";
@@ -60,6 +61,7 @@ interface Props {
 
 export function RoomFormModal({ visible, onClose, room }: Props) {
   const { t, isDark, language } = useAppPreferences();
+  const { height: viewportHeight } = useWindowDimensions();
   const isEdit = !!room;
   const save = useSaveRoom();
 
@@ -73,6 +75,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
   const [openTime, setOpenTime] = useState("07:00");
   const [closeTime, setCloseTime] = useState("21:00");
   const isMonthlyPrice = MONTHLY_TYPES.includes(type);
+  const webMaxHeight = Math.max(420, Math.min(760, viewportHeight - 24));
 
   useEffect(() => {
     if (visible) {
@@ -139,7 +142,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
         >
           <View
             className={`${Platform.OS === "web" ? "w-[95%] max-w-3xl self-center rounded-3xl" : "max-h-[90%] rounded-t-3xl"} overflow-hidden ${isDark ? "bg-paper-dark" : "bg-white"}`}
-            style={Platform.OS === "web" ? { maxHeight: 760 } : undefined}
+            style={Platform.OS === "web" ? { maxHeight: webMaxHeight } : undefined}
           >
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
               <Text className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-ink"}`}>
@@ -155,7 +158,7 @@ export function RoomFormModal({ visible, onClose, room }: Props) {
 
             <ScrollView
               className="flex-1"
-              contentContainerClassName="px-5 pb-6"
+              contentContainerClassName="px-5 pb-8"
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator
             >
