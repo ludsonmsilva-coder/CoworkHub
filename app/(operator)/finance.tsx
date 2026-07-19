@@ -931,7 +931,7 @@ export default function Finance() {
                     <View className="flex-1 mr-1.5">
                       <TextInput
                         className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
-                        placeholder="Valor da despesa"
+                        placeholder="Valor"
                         placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
                         value={expenseAmountInput}
                         onChangeText={setExpenseAmountInput}
@@ -951,7 +951,7 @@ export default function Finance() {
 
                   <Pressable
                     onPress={handleCreateExpense}
-                    className="h-10 px-4 rounded-xl bg-primary items-center justify-center self-start active:bg-primary-dark"
+                    className="h-10 px-3 rounded-xl bg-primary items-center justify-center self-start active:bg-primary-dark"
                     style={({ pressed }) =>
                       pressed
                         ? {
@@ -961,7 +961,7 @@ export default function Finance() {
                         : undefined
                     }
                   >
-                    <Text className="text-white font-semibold">Salvar despesa</Text>
+                    <Text className="text-white font-semibold">Salvar</Text>
                   </Pressable>
 
                   {expenseFeedback ? (
