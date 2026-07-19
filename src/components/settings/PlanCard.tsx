@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppPreferences } from "@/hooks/useAppPreferences";
-import { planLimit, upgradeUrl } from "@/lib/plans";
+import { cancelPlanUrl, planLimit, upgradeUrl } from "@/lib/plans";
 
 export function PlanCard() {
   const { t, isDark, language } = useAppPreferences();
@@ -62,17 +62,36 @@ export function PlanCard() {
           </View>
         </View>
 
-        {plan !== "pro" ? (
-          <Pressable
-            onPress={() => Linking.openURL(upgradeUrl(language))}
-            className="px-4 py-2 rounded-full bg-primary active:bg-primary-dark"
-          >
-            <Text className="text-white text-sm font-semibold">
-              {t("plan.upgradeCta")}
-            </Text>
-          </Pressable>
-        ) : null}
+        <View className="flex-row items-center gap-2">
+          {plan !== "pro" ? (
+            <Pressable
+              onPress={() => Linking.openURL(upgradeUrl(language))}
+              className="px-4 py-2 rounded-full bg-primary active:bg-primary-dark"
+            >
+              <Text className="text-white text-sm font-semibold">
+                {t("plan.upgradeCta")}
+              </Text>
+            </Pressable>
+          ) : null}
+
+          {plan !== "free" ? (
+            <Pressable
+              onPress={() => Linking.openURL(cancelPlanUrl(language, plan))}
+              className={`px-4 py-2 rounded-full border ${
+                isDark ? "border-red-500/50 bg-red-500/10" : "border-red-200 bg-red-50"
+              }`}
+            >
+              <Text className="text-danger text-sm font-semibold">{t("plan.cancelCta")}</Text>
+            </Pressable>
+          ) : null}
+        </View>
       </View>
+
+      {plan !== "free" ? (
+        <Text className={`text-xs mt-2 ${isDark ? "text-slate-400" : "text-ink-low"}`}>
+          {t("plan.cancelHint")}
+        </Text>
+      ) : null}
 
       {!unlimited ? (
         <View
