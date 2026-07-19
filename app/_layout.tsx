@@ -13,12 +13,22 @@ import {
 if (Platform.OS === "web" && typeof document !== "undefined") {
   document.documentElement.lang = "pt-BR";
   document.documentElement.setAttribute("translate", "no");
+  document.documentElement.classList.add("notranslate");
+  document.body?.classList.add("notranslate");
 
   const googleNotranslateMeta = document.querySelector('meta[name="google"]');
   if (!googleNotranslateMeta) {
     const meta = document.createElement("meta");
     meta.setAttribute("name", "google");
     meta.setAttribute("content", "notranslate");
+    document.head.appendChild(meta);
+  }
+
+  const translateNoMeta = document.querySelector('meta[name="translate"]');
+  if (!translateNoMeta) {
+    const meta = document.createElement("meta");
+    meta.setAttribute("name", "translate");
+    meta.setAttribute("content", "no");
     document.head.appendChild(meta);
   }
 
