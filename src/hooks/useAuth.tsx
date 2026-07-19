@@ -29,6 +29,47 @@ function hasPaidOverride(email?: string | null) {
   return PAID_EMAIL_OVERRIDES.has(email?.toLowerCase() ?? "");
 }
 
+type BillingAccessRow = {
+  plan: "free" | "starter" | "pro";
+  status: "inactive" | "pending" | "active" | "cancelled";
+};
+
+async function loadBillingAccessByEmail(email?: string | null) {
+  const normalizedEmail = email?.trim().toLowerCase();
+  if (!normalizedEmail) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from("billing_access")
+      .select("plan, status")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+
+    if (error) {
+      // Tabela/políticas podem não existir em ambientes legados.
+      return null;
+    }
+
+    return (data as BillingAccessRow | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function resolvePlanWithBilling(
+  currentPlan: Space["plan"],
+  billing: BillingAccessRow | null,
+  hasOverride: boolean
+): Space["plan"] {
+  if (billing) {
+    if (billing.status === "active") return billing.plan;
+    if (billing.status === "cancelled" || billing.status === "inactive") return "free";
+  }
+
+  if (hasOverride) return "pro";
+  return currentPlan;
+}
+
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
@@ -57,6 +98,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const paidOverride = hasPaidOverride(userEmail);
+    const billingAccess = await loadBillingAccessByEmail(userEmail);
+
     // 1) É dono de um espaço? -> operador
     const { data: ownedSpace } = await supabase
       .from("spaces")
@@ -66,9 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (ownedSpace) {
       const nextSpace = ownedSpace as Space;
-      if (hasPaidOverride(userEmail)) {
-        nextSpace.plan = "pro";
-      }
+      nextSpace.plan = resolvePlanWithBilling(nextSpace.plan, billingAccess, paidOverride);
       setSpace(nextSpace);
       setMember(null);
       setRole("operator");
@@ -83,7 +125,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (memberRow) {
-      const paidOverride = hasPaidOverride(userEmail);
       setMember(paidOverride ? null : (memberRow as Member));
       setRole(paidOverride ? "operator" : "member");
       const { data: memberSpace } = await supabase
@@ -92,8 +133,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq("id", (memberRow as Member).space_id)
         .maybeSingle();
       const nextSpace = (memberSpace as Space) ?? null;
-      if (nextSpace && paidOverride) {
-        nextSpace.plan = "pro";
+      if (nextSpace) {
+        nextSpace.plan = resolvePlanWithBilling(nextSpace.plan, billingAccess, paidOverride);
       }
       setSpace(nextSpace);
       return;
