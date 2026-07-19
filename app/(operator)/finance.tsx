@@ -32,6 +32,7 @@ import {
   useInvoices,
   useMarkInvoicePaid,
 } from "@/hooks/useInvoices";
+import { useRooms } from "@/hooks/useRooms";
 import { useAuth } from "@/hooks/useAuth";
 import { useMembers } from "@/hooks/useMembers";
 import type { Invoice, InvoiceStatus } from "@/types";
@@ -240,7 +241,7 @@ export default function Finance() {
   const [autoEndDate, setAutoEndDate] = useState(todayISO());
   const [autoFeedback, setAutoFeedback] = useState<string | null>(null);
   const [expenseOpen, setExpenseOpen] = useState(false);
-  const [expenseRoom, setExpenseRoom] = useState("");
+  const [expenseRoomId, setExpenseRoomId] = useState<string | null>(null);
   const [expenseDescription, setExpenseDescription] = useState("");
   const [expenseAmountInput, setExpenseAmountInput] = useState("");
   const [expenseFeedback, setExpenseFeedback] = useState<string | null>(null);
@@ -254,6 +255,7 @@ export default function Finance() {
   const autoGenerate = useGenerateInvoicesAutomatically();
   const syncFinished = useSyncFinishedBookingsToInvoices();
   const { data: members } = useMembers("", null);
+  const { data: activeRooms } = useRooms(true);
   const hasAutoSyncedRef = useRef(false);
 
   const hasFilters = statusFilter !== "all";
@@ -420,18 +422,18 @@ export default function Finance() {
   }
 
   function resetExpenseForm() {
-    setExpenseRoom("");
+    setExpenseRoomId(null);
     setExpenseDescription("");
     setExpenseAmountInput("");
   }
 
   function handleCreateExpense() {
-    const room = expenseRoom.trim();
+    const room = (activeRooms ?? []).find((r) => r.id === expenseRoomId);
     const desc = expenseDescription.trim();
     const amount = Number(expenseAmountInput.replace(",", "."));
 
     if (!room) {
-      setExpenseFeedback("Informe a sala da despesa.");
+      setExpenseFeedback("Selecione uma sala ativa para a despesa.");
       return;
     }
 
@@ -447,14 +449,14 @@ export default function Finance() {
 
     const item: ExpenseItem = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      room,
+      room: room.name,
       description: desc,
       amount,
       created_at: new Date().toISOString(),
     };
 
     setExpenses((prev) => [item, ...prev]);
-    setExpenseFeedback(`Despesa adicionada em ${room}.`);
+    setExpenseFeedback(`Despesa adicionada em ${room.name}.`);
     resetExpenseForm();
   }
 
@@ -886,13 +888,44 @@ export default function Finance() {
               keyboardShouldPersistTaps="handled"
               ListHeaderComponent={
                 <View className="px-5 pt-3">
-                  <TextInput
-                    className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
-                    placeholder="Sala (ex.: Sala A)"
-                    placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
-                    value={expenseRoom}
-                    onChangeText={setExpenseRoom}
-                  />
+                  <Text className={`font-medium mb-1.5 text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>
+                    Sala ativa
+                  </Text>
+                  {(activeRooms ?? []).length === 0 ? (
+                    <View className={`rounded-xl border px-3 py-2 mb-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}>
+                      <Text className={`text-xs ${isDark ? "text-slate-400" : "text-ink-low"}`}>
+                        Nenhuma sala ativa disponível.
+                      </Text>
+                    </View>
+                  ) : (
+                    <View className="flex-row flex-wrap gap-2 mb-2">
+                      {(activeRooms ?? []).map((room) => {
+                        const selected = expenseRoomId === room.id;
+                        return (
+                          <Pressable
+                            key={room.id}
+                            onPress={() => setExpenseRoomId(room.id)}
+                            className={`px-3 py-2 rounded-full border flex-row items-center ${
+                              selected
+                                ? "border-primary bg-primary-light"
+                                : isDark
+                                  ? "bg-card-dark border-border-dark"
+                                  : "border-gray-200 bg-white"
+                            }`}
+                          >
+                            <View className="h-2.5 w-2.5 rounded-full mr-2" style={{ backgroundColor: room.color }} />
+                            <Text
+                              className={`text-sm font-medium ${
+                                selected ? "text-primary" : isDark ? "text-slate-300" : "text-ink-mid"
+                              }`}
+                            >
+                              {room.name}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  )}
 
                   <View className="flex-row">
                     <View className="flex-1 mr-1.5">
