@@ -559,7 +559,7 @@ export default function Finance() {
 
         <Pressable
           onPress={() => {
-            setExpenseOpen((prev) => !prev);
+            setExpenseOpen(true);
             setExpenseFeedback(null);
           }}
           className={`h-11 px-4 rounded-xl border items-center justify-center flex-row ${
@@ -577,7 +577,7 @@ export default function Finance() {
           }
         >
           <Plus size={16} color="#0E4A7A" />
-          <Text className="text-primary font-semibold ml-1.5">Nova despesa</Text>
+          <Text className="text-primary font-semibold ml-1.5">Despesas</Text>
         </Pressable>
 
         <Pressable
@@ -606,112 +606,6 @@ export default function Finance() {
           </Text>
         </Pressable>
       </View>
-
-      {expenseOpen ? (
-        <View className="px-5 mb-3">
-          <View className={`rounded-2xl border p-3 ${isDark ? "bg-card-dark border-border-dark" : "bg-white border-gray-200"}`}>
-            <Text className={`font-semibold mb-2 ${isDark ? "text-slate-100" : "text-ink"}`}>Despesas por sala</Text>
-
-            <TextInput
-              className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
-              placeholder="Sala (ex.: Sala A)"
-              placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
-              value={expenseRoom}
-              onChangeText={setExpenseRoom}
-            />
-
-            <View className="flex-row">
-              <View className="flex-1 mr-1.5">
-                <TextInput
-                  className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
-                  placeholder="Valor da despesa"
-                  placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
-                  value={expenseAmountInput}
-                  onChangeText={setExpenseAmountInput}
-                  keyboardType="numbers-and-punctuation"
-                />
-              </View>
-              <View className="flex-1 ml-1.5">
-                <TextInput
-                  className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
-                  placeholder="Descrição"
-                  placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
-                  value={expenseDescription}
-                  onChangeText={setExpenseDescription}
-                />
-              </View>
-            </View>
-
-            <Pressable
-              onPress={handleCreateExpense}
-              className="h-10 px-4 rounded-xl bg-primary items-center justify-center self-start active:bg-primary-dark"
-              style={({ pressed }) =>
-                pressed
-                  ? {
-                      transform: [{ scale: 0.985 }],
-                      opacity: 0.95,
-                    }
-                  : undefined
-              }
-            >
-              <Text className="text-white font-semibold">Salvar despesa</Text>
-            </Pressable>
-
-            {expenseFeedback ? (
-              <Text className={`text-xs mt-2 ${isDark ? "text-slate-400" : "text-ink-low"}`}>{expenseFeedback}</Text>
-            ) : null}
-
-            <View className="mt-3">
-              {expenseTotalsRows.length === 0 ? (
-                <View className={`rounded-xl border px-3 py-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}>
-                  <Text className={`text-xs ${isDark ? "text-slate-400" : "text-ink-low"}`}>Sem despesas cadastradas ainda.</Text>
-                </View>
-              ) : (
-                expenseTotalsRows.map(([room, total]) => (
-                  <View
-                    key={`expense-total-${room}`}
-                    className={`rounded-xl border px-3 py-2 mb-2 flex-row items-center justify-between ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}
-                  >
-                    <Text className={`text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>{room}</Text>
-                    <Text className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-ink"}`}>
-                      {formatMoney(total, space?.currency ?? "USD", language)}
-                    </Text>
-                  </View>
-                ))
-              )}
-            </View>
-
-            {expenses.length > 0 ? (
-              <View className="mt-1">
-                {expenses.map((item) => {
-                  const dateText = new Date(item.created_at).toLocaleDateString(language);
-                  return (
-                    <View
-                      key={item.id}
-                      className={`rounded-xl border px-3 py-2 mb-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}
-                    >
-                      <View className="flex-row items-center justify-between">
-                        <Text className={`text-xs flex-1 mr-2 ${isDark ? "text-slate-300" : "text-ink-mid"}`} numberOfLines={1}>
-                          {item.room} · {item.description} · {dateText}
-                        </Text>
-                        <Text className={`text-xs font-semibold mr-2 ${isDark ? "text-slate-100" : "text-ink"}`}>
-                          {formatMoney(item.amount, space?.currency ?? "USD", language)}
-                        </Text>
-                        <Pressable
-                          onPress={() => handleDeleteExpense(item.id)}
-                          className="h-7 w-7 rounded-full items-center justify-center bg-danger/10"
-                        >
-                          <Trash2 size={14} color="#DC2626" />
-                        </Pressable>
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            ) : null}
-          </View>
-        </View>
-      ) : null}
 
       <View className="px-5 mb-3">
         <Text className={`font-medium mb-1.5 text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>
@@ -966,6 +860,129 @@ export default function Finance() {
                 </Text>
               </Pressable>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={expenseOpen} animationType="slide" transparent>
+        <View className="flex-1 bg-black/40 justify-end">
+          <View className={`rounded-t-3xl ${isDark ? "bg-paper-dark" : "bg-white"}`} style={{ maxHeight: "86%" }}>
+            <View className="flex-row items-center justify-between px-5 pt-5 pb-1">
+              <View>
+                <Text className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-ink"}`}>Despesas</Text>
+                <Text className={`text-xs ${isDark ? "text-slate-400" : "text-ink-low"}`}>Controle por sala</Text>
+              </View>
+              <Pressable
+                onPress={() => setExpenseOpen(false)}
+                className={`h-9 w-9 rounded-full items-center justify-center ${isDark ? "bg-slate-800" : "bg-gray-100"}`}
+              >
+                <X size={18} color="#3D4451" />
+              </Pressable>
+            </View>
+
+            <FlatList
+              data={expenses}
+              keyExtractor={(item) => item.id}
+              keyboardShouldPersistTaps="handled"
+              ListHeaderComponent={
+                <View className="px-5 pt-3">
+                  <TextInput
+                    className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
+                    placeholder="Sala (ex.: Sala A)"
+                    placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
+                    value={expenseRoom}
+                    onChangeText={setExpenseRoom}
+                  />
+
+                  <View className="flex-row">
+                    <View className="flex-1 mr-1.5">
+                      <TextInput
+                        className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
+                        placeholder="Valor da despesa"
+                        placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
+                        value={expenseAmountInput}
+                        onChangeText={setExpenseAmountInput}
+                        keyboardType="numbers-and-punctuation"
+                      />
+                    </View>
+                    <View className="flex-1 ml-1.5">
+                      <TextInput
+                        className={`h-11 rounded-xl border px-3 text-sm mb-2 ${isDark ? "border-border-dark text-slate-100 bg-slate-900" : "border-gray-200 text-ink bg-white"}`}
+                        placeholder="Descrição"
+                        placeholderTextColor={isDark ? "#64748B" : "#9CA3AF"}
+                        value={expenseDescription}
+                        onChangeText={setExpenseDescription}
+                      />
+                    </View>
+                  </View>
+
+                  <Pressable
+                    onPress={handleCreateExpense}
+                    className="h-10 px-4 rounded-xl bg-primary items-center justify-center self-start active:bg-primary-dark"
+                    style={({ pressed }) =>
+                      pressed
+                        ? {
+                            transform: [{ scale: 0.985 }],
+                            opacity: 0.95,
+                          }
+                        : undefined
+                    }
+                  >
+                    <Text className="text-white font-semibold">Salvar despesa</Text>
+                  </Pressable>
+
+                  {expenseFeedback ? (
+                    <Text className={`text-xs mt-2 ${isDark ? "text-slate-400" : "text-ink-low"}`}>{expenseFeedback}</Text>
+                  ) : null}
+
+                  <View className="mt-3">
+                    {expenseTotalsRows.length === 0 ? (
+                      <View className={`rounded-xl border px-3 py-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}>
+                        <Text className={`text-xs ${isDark ? "text-slate-400" : "text-ink-low"}`}>Sem despesas cadastradas ainda.</Text>
+                      </View>
+                    ) : (
+                      expenseTotalsRows.map(([room, total]) => (
+                        <View
+                          key={`expense-total-${room}`}
+                          className={`rounded-xl border px-3 py-2 mb-2 flex-row items-center justify-between ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}
+                        >
+                          <Text className={`text-sm ${isDark ? "text-slate-300" : "text-ink-mid"}`}>{room}</Text>
+                          <Text className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-ink"}`}>
+                            {formatMoney(total, space?.currency ?? "USD", language)}
+                          </Text>
+                        </View>
+                      ))
+                    )}
+                  </View>
+                </View>
+              }
+              renderItem={({ item }) => {
+                const dateText = new Date(item.created_at).toLocaleDateString(language);
+                return (
+                  <View className="px-5">
+                    <View
+                      className={`rounded-xl border px-3 py-2 mb-2 ${isDark ? "border-border-dark bg-slate-900" : "border-gray-200 bg-gray-50"}`}
+                    >
+                      <View className="flex-row items-center justify-between">
+                        <Text className={`text-xs flex-1 mr-2 ${isDark ? "text-slate-300" : "text-ink-mid"}`} numberOfLines={1}>
+                          {item.room} · {item.description} · {dateText}
+                        </Text>
+                        <Text className={`text-xs font-semibold mr-2 ${isDark ? "text-slate-100" : "text-ink"}`}>
+                          {formatMoney(item.amount, space?.currency ?? "USD", language)}
+                        </Text>
+                        <Pressable
+                          onPress={() => handleDeleteExpense(item.id)}
+                          className="h-7 w-7 rounded-full items-center justify-center bg-danger/10"
+                        >
+                          <Trash2 size={14} color="#DC2626" />
+                        </Pressable>
+                      </View>
+                    </View>
+                  </View>
+                );
+              }}
+              contentContainerClassName="pb-24"
+            />
           </View>
         </View>
       </Modal>
